@@ -1,0 +1,24 @@
+
+# MICHAELRDP - Criar usuário com senha automática
+
+$ErrorActionPreference = "Stop"
+
+$chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*'
+
+$password = -join (1..20 | ForEach-Object {
+    $chars[(Get-Random -Maximum $chars.Length)]
+})
+
+$securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+
+if (-not (Get-LocalUser -Name "MICHAELRDP" -ErrorAction SilentlyContinue)) {
+    New-LocalUser -Name "MICHAELRDP" `
+        -Password $securePassword `
+        -AccountNeverExpires
+}
+
+Add-LocalGroupMember -Group "Remote Desktop Users" `
+    -Member "MICHAELRDP" -ErrorAction SilentlyContinue
+
+Write-Host "MICHAELRDP criado."
+Write-Host "Guarde a senha gerada em local privado."
